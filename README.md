@@ -39,6 +39,7 @@ A local-first CLI coding agent that brings the power of agentic coding tools lik
   - [Enhanced User Experience](#enhanced-user-experience)
   - [Developer Features](#developer-features)
 - [VS Code Extension](#vs-code-extension)
+- [GitHub Copilot Integration](#github-copilot-integration)
 - [Community](#community)
 
 ## FAQs
@@ -752,6 +753,52 @@ nanocoder --vscode
 ```
 
 For full documentation including installation options, configuration, and troubleshooting, see the [VS Code Extension Guide](docs/vscode-extension.md).
+
+## GitHub Copilot Integration
+
+Nanocoder is configured to work seamlessly with GitHub Copilot to enhance the development experience for contributors. When enabled in the repository, Copilot can provide intelligent code suggestions, issue analysis, and pull request reviews.
+
+### For Contributors
+
+If you have GitHub Copilot enabled, it will provide context-aware suggestions when working with Nanocoder:
+
+- **Code Completion**: Get TypeScript-aware completions following Nanocoder's strict coding standards
+- **Issue Analysis**: Copilot can analyze bug reports and suggest potential fixes based on the codebase
+- **PR Reviews**: Receive automated feedback on pull requests to ensure code quality and consistency
+- **Documentation**: Get help writing or improving documentation with project-specific context
+
+### Copilot Configuration
+
+The repository includes:
+
+1. **`.github/copilot-instructions.md`**: Provides Copilot with comprehensive context about:
+   - Project architecture and patterns
+   - Code style guidelines (TypeScript strict mode, Biome formatting)
+   - Testing requirements and practices
+   - Development commands and workflows
+   - AI provider integration patterns
+
+2. **Issue and PR Templates**: Enhanced with Copilot-friendly metadata to guide:
+   - Bug report analysis and root cause identification
+   - Feature request evaluation against project philosophy
+   - Code review focusing on TypeScript, testing, and provider compatibility
+
+3. **Existing CI/CD**: The repository already has comprehensive automation via `.github/workflows/pr-checks.yml`:
+   - Automated linting, type checking, and formatting
+   - Unit tests with coverage analysis (80% threshold)
+   - Security scanning (Semgrep, CodeQL)
+   - Build verification
+   - Package audit
+
+### Enabling Copilot
+
+GitHub Copilot can be enabled at different levels:
+
+- **Repository Level**: Administrators can enable Copilot for the repository in Settings → Code & automation → GitHub Copilot
+- **Organization Level**: Organization owners can manage Copilot access for all repositories
+- **Personal Use**: Individual contributors need a GitHub Copilot subscription to access features
+
+For more information about GitHub Copilot, visit the [official documentation](https://docs.github.com/en/copilot).
 
 ## Community
 

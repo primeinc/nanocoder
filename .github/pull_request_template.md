@@ -1,3 +1,13 @@
+<!--
+GitHub Copilot Instructions:
+- Review code changes for TypeScript strict mode compliance
+- Check for proper test coverage in .spec.ts files
+- Verify structured logging usage with Pino
+- Ensure compatibility with multiple AI providers
+- Validate adherence to Biome formatting standards
+- Suggest improvements following CONTRIBUTING.md guidelines
+-->
+
 ## Description
 
 Brief description of what this PR does
