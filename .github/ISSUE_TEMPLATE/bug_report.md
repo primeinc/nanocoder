@@ -6,14 +6,6 @@ labels: bug
 assignees: ''
 ---
 
-<!--
-GitHub Copilot instructions for this template:
-- Review existing bugs to check for duplicates
-- Analyze logs and error messages for root cause
-- Suggest potential fixes based on codebase patterns
-- Recommend test cases to prevent regression
--->
-
 ## Description
 
 Brief description of the bug
