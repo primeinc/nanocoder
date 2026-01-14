@@ -45,7 +45,7 @@ export function assembleMessageContent(inputState: InputState): MessageContent {
 
 		// Add any text before this placeholder
 		const textBefore = currentText.substring(0, placeholderIndex);
-		if (textBefore.trim()) {
+		if (textBefore.length > 0) {
 			contentParts.push({
 				type: 'text',
 				text: textBefore,
@@ -88,7 +88,7 @@ export function assembleMessageContent(inputState: InputState): MessageContent {
 	}
 
 	// Add any remaining text
-	if (currentText.trim()) {
+	if (currentText.length > 0) {
 		contentParts.push({
 			type: 'text',
 			text: currentText,

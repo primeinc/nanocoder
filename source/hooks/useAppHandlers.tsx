@@ -262,10 +262,10 @@ export function useAppHandlers(props: UseAppHandlersProps): AppHandlers {
 							.map(part => part.text)
 							.join('');
 
-			// Wrap handleChatMessage to pass original MessageContent for regular messages
-			const wrappedHandleChatMessage = async (_msg: string) => {
-				// If this is a regular message (not a command), use the original MessageContent
-				// Otherwise, commands get parsed string
+			// Wrap handleChatMessage to always pass the original MessageContent
+			const wrappedHandleChatMessage = async () => {
+				// The parsed string passed by handleMessageSubmission is ignored here;
+				// we always forward the original MessageContent to handleChatMessage.
 				await props.handleChatMessage(message);
 			};
 
