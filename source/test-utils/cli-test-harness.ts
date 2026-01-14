@@ -310,8 +310,6 @@ export class CLITestHarness extends EventEmitter {
 		if (length === 1) {
 			return this.stderrChunks[0].toString();
 		}
-		if (this.stderrChunks.length === 0) return '';
-		if (this.stderrChunks.length === 1) return this.stderrChunks[0].toString();
 		return Buffer.concat(this.stderrChunks).toString();
 	}
 
