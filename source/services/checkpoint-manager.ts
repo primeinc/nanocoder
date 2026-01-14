@@ -11,6 +11,7 @@ import type {
 	CheckpointValidationResult,
 } from '@/types/checkpoint';
 import type {Message} from '@/types/core';
+import {messageContentToString} from '@/types/core';
 import {validateCheckpointName} from '@/utils/checkpoint-utils';
 import {logWarning} from '@/utils/message-queue';
 import {FileSnapshotService} from './file-snapshot';
@@ -78,7 +79,7 @@ export class CheckpointManager {
 			return 'Empty conversation';
 		}
 
-		const firstMessage = userMessages[0].content;
+		const firstMessage = messageContentToString(userMessages[0].content);
 		// Take first characters and add ellipsis if longer
 		return firstMessage.length > TRUNCATION_DESCRIPTION_LENGTH
 			? `${firstMessage.substring(0, TRUNCATION_DESCRIPTION_LENGTH)}...`

@@ -9,11 +9,42 @@ export {tool, jsonSchema};
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic typing required
 export type AISDKCoreTool = AISDKTool<any, any>;
 
+// Multimodal content types for vision support
+export interface TextContent {
+	type: 'text';
+	text: string;
+}
+
+export interface ImageContent {
+	type: 'image_url';
+	image_url: {
+		url: string; // data URL or http URL
+		detail?: 'low' | 'high' | 'auto';
+	};
+}
+
+export type MessageContent = string | Array<TextContent | ImageContent>;
+
+/**
+ * Convert MessageContent to string for legacy code that expects strings
+ * For multimodal content, extracts text parts only
+ */
+export function messageContentToString(content: MessageContent): string {
+	if (typeof content === 'string') {
+		return content;
+	}
+	// Extract text from multimodal content
+	return content
+		.filter(part => part.type === 'text')
+		.map(part => part.text)
+		.join('');
+}
+
 // Current Nanocoder message format (OpenAI-compatible)
 // Note: We maintain this format internally and convert to ModelMessage at AI SDK boundary
 export interface Message {
 	role: 'user' | 'assistant' | 'system' | 'tool';
-	content: string;
+	content: MessageContent;
 	tool_calls?: ToolCall[];
 	tool_call_id?: string;
 	name?: string;

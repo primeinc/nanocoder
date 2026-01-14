@@ -1,4 +1,11 @@
-import type {AssistantContent, ModelMessage, TextPart, ToolCallPart} from 'ai';
+import type {
+	AssistantContent,
+	ImagePart,
+	ModelMessage,
+	TextPart,
+	ToolCallPart,
+	UserContent,
+} from 'ai';
 import type {Message} from '@/types/index';
 import type {TestableMessage} from '../types.js';
 
@@ -29,10 +36,15 @@ export function isEmptyAssistantMessage(message: TestableMessage): boolean {
  * Convert our Message format to AI SDK v6 ModelMessage format
  *
  * Tool messages: Converted to AI SDK tool-result format with proper structure.
+ * User messages: Support both string and multimodal content arrays
  */
 export function convertToModelMessages(messages: Message[]): ModelMessage[] {
 	return messages.map((msg): ModelMessage => {
 		if (msg.role === 'tool') {
+			// Tool messages must have string content
+			const toolContent =
+				typeof msg.content === 'string' ? msg.content : String(msg.content);
+
 			// Convert to AI SDK tool-result format
 			// AI SDK expects: { role: 'tool', content: [{ type: 'tool-result', toolCallId, toolName, output }] }
 			// where output is { type: 'text', value: string } or { type: 'json', value: JSONValue }
@@ -45,7 +57,7 @@ export function convertToModelMessages(messages: Message[]): ModelMessage[] {
 						toolName: msg.name || '',
 						output: {
 							type: 'text',
-							value: msg.content,
+							value: toolContent,
 						},
 					},
 				],
@@ -53,16 +65,42 @@ export function convertToModelMessages(messages: Message[]): ModelMessage[] {
 		}
 
 		if (msg.role === 'system') {
+			// System messages are always strings
+			const systemContent =
+				typeof msg.content === 'string' ? msg.content : String(msg.content);
 			return {
 				role: 'system',
-				content: msg.content,
+				content: systemContent,
 			};
 		}
 
 		if (msg.role === 'user') {
+			// User messages can be string or multimodal array
+			if (typeof msg.content === 'string') {
+				return {
+					role: 'user',
+					content: msg.content,
+				};
+			}
+
+			// Convert our multimodal format to AI SDK format
+			const userContent: UserContent = msg.content.map(part => {
+				if (part.type === 'text') {
+					return {
+						type: 'text',
+						text: part.text,
+					} as TextPart;
+				}
+				// Image content
+				return {
+					type: 'image',
+					image: part.image_url.url,
+				} as ImagePart;
+			});
+
 			return {
 				role: 'user',
-				content: msg.content,
+				content: userContent,
 			};
 		}
 
@@ -72,9 +110,12 @@ export function convertToModelMessages(messages: Message[]): ModelMessage[] {
 
 			// Add text content if present
 			if (msg.content) {
+				// Assistant content is always string
+				const textContent =
+					typeof msg.content === 'string' ? msg.content : String(msg.content);
 				content.push({
 					type: 'text',
-					text: msg.content,
+					text: textContent,
 				} as TextPart);
 			}
 
@@ -107,7 +148,8 @@ export function convertToModelMessages(messages: Message[]): ModelMessage[] {
 		// Fallback - should never happen
 		return {
 			role: 'user',
-			content: msg.content,
+			content:
+				typeof msg.content === 'string' ? msg.content : String(msg.content),
 		};
 	});
 }

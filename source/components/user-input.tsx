@@ -9,17 +9,17 @@ import {useResponsiveTerminal} from '@/hooks/useTerminalWidth';
 import {useTheme} from '@/hooks/useTheme';
 import {useUIStateContext} from '@/hooks/useUIState';
 import {promptHistory} from '@/prompt-history';
-import type {DevelopmentMode} from '@/types/core';
+import type {DevelopmentMode, MessageContent} from '@/types/core';
 import {Completion} from '@/types/index';
 import {
 	getCurrentFileMention,
 	getFileCompletions,
 } from '@/utils/file-autocomplete';
 import {handleFileMention} from '@/utils/file-mention-handler';
-import {assemblePrompt} from '@/utils/prompt-processor';
+import {assembleMessageContent} from '@/utils/message-content-assembler';
 
 interface ChatProps {
-	onSubmit?: (message: string) => void;
+	onSubmit?: (message: MessageContent) => void;
 	placeholder?: string;
 	customCommands?: string[]; // List of custom command names and aliases
 	disabled?: boolean; // Disable input when AI is processing
@@ -202,12 +202,12 @@ export default function UserInput({
 	// Handle form submission
 	const handleSubmit = useCallback(() => {
 		if (input.trim() && onSubmit) {
-			// Assemble the full prompt by replacing placeholders with content
-			const fullMessage = assemblePrompt(currentState);
+			// Assemble the message content (handles both text and images)
+			const messageContent = assembleMessageContent(currentState);
 
 			// Save the InputState to history and send assembled message to AI
 			promptHistory.addPrompt(currentState);
-			onSubmit(fullMessage);
+			onSubmit(messageContent);
 			resetInput();
 			resetUIState();
 			promptHistory.resetIndex();

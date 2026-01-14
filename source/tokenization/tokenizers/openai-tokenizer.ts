@@ -5,6 +5,7 @@
 
 import {encoding_for_model, get_encoding, type TiktokenModel} from 'tiktoken';
 import type {Message} from '@/types/core';
+import {messageContentToString} from '@/types/core';
 import type {Tokenizer} from '../../types/tokenization';
 
 /**
@@ -34,7 +35,7 @@ export class OpenAITokenizer implements Tokenizer {
 	}
 
 	countTokens(message: Message): number {
-		const content = message.content || '';
+		const content = messageContentToString(message.content || '');
 		const role = message.role || '';
 
 		// OpenAI format: each message has overhead for role markers

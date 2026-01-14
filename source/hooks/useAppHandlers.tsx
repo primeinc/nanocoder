@@ -20,6 +20,7 @@ import type {
 	LSPConnectionStatus,
 	MCPConnectionStatus,
 	Message,
+	MessageContent,
 } from '@/types';
 import type {CustomCommand} from '@/types/commands';
 import type {ThemePreset} from '@/types/ui';
@@ -77,7 +78,7 @@ interface UseAppHandlersProps {
 	enterMcpWizardMode: () => void;
 
 	// Chat handler
-	handleChatMessage: (message: string) => Promise<void>;
+	handleChatMessage: (message: MessageContent) => Promise<void>;
 }
 
 export interface AppHandlers {
@@ -94,7 +95,7 @@ export interface AppHandlers {
 		checkpoints: CheckpointListItem[],
 		currentMessageCount: number,
 	) => void;
-	handleMessageSubmit: (message: string) => Promise<void>;
+	handleMessageSubmit: (message: MessageContent) => Promise<void>;
 }
 
 /**
@@ -248,11 +249,27 @@ export function useAppHandlers(props: UseAppHandlersProps): AppHandlers {
 
 	// Message submit handler
 	const handleMessageSubmit = React.useCallback(
-		async (message: string) => {
+		async (message: MessageContent) => {
 			// Reset conversation completion flag when starting a new message
 			props.setIsConversationComplete(false);
 
-			await handleMessageSubmission(message, {
+			// Convert MessageContent to string for command parsing
+			const messageString =
+				typeof message === 'string'
+					? message
+					: message
+							.filter(part => part.type === 'text')
+							.map(part => part.text)
+							.join('');
+
+			// Wrap handleChatMessage to pass original MessageContent for regular messages
+			const wrappedHandleChatMessage = async (_msg: string) => {
+				// If this is a regular message (not a command), use the original MessageContent
+				// Otherwise, commands get parsed string
+				await props.handleChatMessage(message);
+			};
+
+			await handleMessageSubmission(messageString, {
 				customCommandCache: props.customCommandCache,
 				customCommandLoader: props.customCommandLoader,
 				customCommandExecutor: props.customCommandExecutor,
@@ -268,7 +285,7 @@ export function useAppHandlers(props: UseAppHandlersProps): AppHandlers {
 				onEnterNanocoderShapeSelectionMode:
 					props.enterNanocoderShapeSelectionMode,
 				onShowStatus: handleShowStatus,
-				onHandleChatMessage: props.handleChatMessage,
+				onHandleChatMessage: wrappedHandleChatMessage,
 				onAddToChatQueue: props.addToChatQueue,
 				setLiveComponent: props.setLiveComponent,
 				setIsToolExecuting: props.setIsToolExecuting,

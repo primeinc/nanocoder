@@ -82,9 +82,11 @@ export function useInputState() {
 			const existingPlaceholder = lastPasteIdRef.current
 				? currentState.placeholderContent[lastPasteIdRef.current]
 				: null;
-			const dynamicWindow = existingPlaceholder
-				? getDynamicPasteWindow(existingPlaceholder.content.length)
-				: PASTE_CHUNK_BASE_WINDOW_MS;
+			const dynamicWindow =
+				existingPlaceholder &&
+				existingPlaceholder.type === PlaceholderType.PASTE
+					? getDynamicPasteWindow(existingPlaceholder.content.length)
+					: PASTE_CHUNK_BASE_WINDOW_MS;
 
 			if (
 				lastPasteIdRef.current &&
@@ -147,9 +149,10 @@ export function useInputState() {
 				const activePlaceholder = activePasteId
 					? currentState.placeholderContent[activePasteId]
 					: null;
-				const activeWindow = activePlaceholder
-					? getDynamicPasteWindow(activePlaceholder.content.length)
-					: PASTE_CHUNK_BASE_WINDOW_MS;
+				const activeWindow =
+					activePlaceholder && activePlaceholder.type === PlaceholderType.PASTE
+						? getDynamicPasteWindow(activePlaceholder.content.length)
+						: PASTE_CHUNK_BASE_WINDOW_MS;
 
 				if (
 					activePasteId &&

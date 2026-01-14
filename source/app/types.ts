@@ -1,3 +1,5 @@
+import type {MessageContent} from '@/types/core';
+
 /**
  * Props for the main App component
  */
@@ -33,5 +35,5 @@ export interface NonInteractiveModeState {
 	isToolExecuting: boolean;
 	isToolConfirmationMode: boolean;
 	isConversationComplete: boolean;
-	messages: Array<{role: string; content: string}>;
+	messages: Array<{role: string; content: MessageContent}>;
 }

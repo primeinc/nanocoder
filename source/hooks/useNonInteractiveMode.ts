@@ -3,7 +3,7 @@ import {isNonInteractiveModeComplete} from '@/app/helpers';
 import type {NonInteractiveModeState} from '@/app/types';
 import {TIMEOUT_EXECUTION_MAX_MS, TIMEOUT_OUTPUT_FLUSH_MS} from '@/constants';
 import {setCurrentMode as setCurrentModeContext} from '@/context/mode-context';
-import type {DevelopmentMode, LLMClient} from '@/types';
+import type {DevelopmentMode, LLMClient, MessageContent} from '@/types';
 import {getLogger} from '@/utils/logging';
 
 interface UseNonInteractiveModeProps {
@@ -13,7 +13,7 @@ interface UseNonInteractiveModeProps {
 	client: LLMClient | null;
 	appState: NonInteractiveModeState;
 	setDevelopmentMode: (mode: DevelopmentMode) => void;
-	handleMessageSubmit: (message: string) => Promise<void>;
+	handleMessageSubmit: (message: MessageContent) => Promise<void>;
 }
 
 export interface NonInteractiveModeResult {

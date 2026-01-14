@@ -5,6 +5,7 @@
 
 import {countTokens as anthropicCountTokens} from '@anthropic-ai/tokenizer';
 import type {Message} from '@/types/core';
+import {messageContentToString} from '@/types/core';
 import type {Tokenizer} from '../../types/tokenization';
 
 /**
@@ -27,7 +28,7 @@ export class AnthropicTokenizer implements Tokenizer {
 	}
 
 	countTokens(message: Message): number {
-		const content = message.content || '';
+		const content = messageContentToString(message.content || '');
 		const role = message.role || '';
 
 		// Anthropic format includes role in the message structure
