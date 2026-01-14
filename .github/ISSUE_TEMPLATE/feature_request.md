@@ -6,6 +6,15 @@ labels: enhancement
 assignees: ''
 ---
 
+<!--
+GitHub Copilot instructions for this template:
+- Check if similar features exist in the codebase
+- Evaluate alignment with local-first philosophy
+- Suggest implementation approach using existing patterns
+- Consider impact on multiple AI providers
+- Recommend related documentation updates
+-->
+
 ## Description
 
 Brief description of the feature you'd like to see
