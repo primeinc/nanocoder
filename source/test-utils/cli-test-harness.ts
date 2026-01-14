@@ -292,12 +292,6 @@ export class CLITestHarness extends EventEmitter {
 	 * @returns The stdout output collected so far
 	 */
 	getCurrentStdout(): string {
-		if (this.stdoutChunks.length === 0) return '';
-		if (this.stdoutChunks.length === 1) return this.stdoutChunks[0].toString();
-		return Buffer.concat(this.stdoutChunks).toString();
-	}
-
-	getCurrentStdout(): string {
 		const length = this.stdoutChunks.length;
 		if (length === 0) {
 			return '';
