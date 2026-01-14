@@ -714,6 +714,15 @@ Generate comprehensive unit tests for {{component}}. Include:
 - **Dynamic tool loading**: Tools are loaded on-demand from configured MCP servers
 - **Tool approval**: Optional confirmation before executing potentially destructive operations
 
+### Vision/Multimodal Support
+
+- **Image input**: Reference images using `@` syntax (e.g., `@screenshot.png`, `@assets/diagram.jpg`)
+- **Automatic detection**: Image files (PNG, JPG, JPEG, WEBP, GIF) are automatically detected and encoded
+- **Base64 encoding**: Images are converted to data URLs for model processing
+- **Mixed content**: Combine text, code files, and images in a single prompt
+- **Compatible models**: Works with vision-capable models like GPT-4V, Qwen3, Gemini Pro Vision, Claude 3.5 Sonnet
+- **Example usage**: `@diagram.png explain what this architecture diagram shows`
+
 ### Custom Command System
 
 - **Markdown-based commands**: Define reusable prompts in `.nanocoder/commands/`
