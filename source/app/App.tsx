@@ -28,6 +28,7 @@ import {TitleShapeContext, updateTitleShape} from '@/hooks/useTitleShape';
 import {useToolHandler} from '@/hooks/useToolHandler';
 import {UIStateProvider} from '@/hooks/useUIState';
 import {useVSCodeServer} from '@/hooks/useVSCodeServer';
+import type {MessageContent} from '@/types/core';
 import {
 	generateCorrelationId,
 	withNewCorrelationContext,
@@ -95,7 +96,7 @@ export default function App({
 	// VS Code server integration
 	// Reference to handleMessageSubmit that will be set after appHandlers is created
 	const handleMessageSubmitRef = React.useRef<
-		((message: string) => void) | null
+		((message: MessageContent) => void) | null
 	>(null);
 
 	const handleVSCodePrompt = React.useCallback(

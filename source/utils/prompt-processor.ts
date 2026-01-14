@@ -116,6 +116,7 @@ export function processPromptTemplate(): string {
 /**
  * Assemble the final prompt by replacing all placeholders with their full content
  * This function is called before sending the prompt to the AI
+ * Note: This is for backward compatibility - images should use assembleMessageContent instead
  */
 export function assemblePrompt(inputState: InputState): string {
 	let assembledPrompt = inputState.displayValue;
@@ -124,7 +125,7 @@ export function assemblePrompt(inputState: InputState): string {
 	Object.entries(inputState.placeholderContent).forEach(
 		([placeholderId, placeholderContent]) => {
 			// Each placeholder type can have its own replacement logic
-			let replacementContent = placeholderContent.content || '';
+			let replacementContent = '';
 
 			// Type-specific content assembly (extensible for future types)
 			switch (placeholderContent.type) {
@@ -141,6 +142,12 @@ export function assemblePrompt(inputState: InputState): string {
 					const header = `=== File: ${fileName} ===`;
 					const footer = '='.repeat(header.length);
 					replacementContent = `${header}\n${placeholderContent.content}\n${footer}`;
+					break;
+				}
+				case PlaceholderType.IMAGE: {
+					// Images should be handled through assembleMessageContent
+					// For legacy callers, just show a placeholder
+					replacementContent = `[Image: ${placeholderContent.filePath}]`;
 					break;
 				}
 				default: {

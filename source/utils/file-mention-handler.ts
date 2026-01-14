@@ -1,9 +1,15 @@
+import {statSync} from 'node:fs';
 import {
 	InputState,
 	PlaceholderContent,
 	PlaceholderType,
 } from '../types/hooks.js';
 import {loadFileContent} from './file-content-loader.js';
+import {
+	encodeImageToDataURL,
+	getImageMimeType,
+	isImageFile,
+} from './image-utils.js';
 
 /**
  * Handle @file mention by creating a placeholder
@@ -18,7 +24,17 @@ export async function handleFileMention(
 	mentionText: string, // The original "@src/app.tsx:10-20" text to replace
 	lineRange?: {start: number; end?: number},
 ): Promise<InputState | null> {
-	// Load file content
+	// Check if this is an image file
+	if (isImageFile(filePath)) {
+		return handleImageMention(
+			filePath,
+			currentDisplayValue,
+			currentPlaceholderContent,
+			mentionText,
+		);
+	}
+
+	// Load file content for text files
 	const fileResult = await loadFileContent(filePath, lineRange);
 
 	// If file doesn't exist or failed to load, return null (silently skip per spec)
@@ -63,6 +79,69 @@ export async function handleFileMention(
 		displayValue: newDisplayValue,
 		placeholderContent: newPlaceholderContent,
 	};
+}
+
+/**
+ * Handle @image mention by creating an image placeholder
+ * Internal helper function called by handleFileMention
+ */
+function handleImageMention(
+	filePath: string,
+	currentDisplayValue: string,
+	currentPlaceholderContent: Record<string, PlaceholderContent>,
+	mentionText: string,
+): InputState | null {
+	try {
+		// Encode image to data URL
+		const dataURL = encodeImageToDataURL(filePath);
+		const mimeType = getImageMimeType(filePath);
+
+		if (!mimeType) {
+			return null;
+		}
+
+		// Get file stats for metadata
+		const stats = statSync(filePath);
+
+		// Generate unique ID for this image placeholder
+		const existingImageCount = Object.values(currentPlaceholderContent).filter(
+			content => content.type === PlaceholderType.IMAGE,
+		).length;
+		const imageId = `image_${existingImageCount + 1}`;
+
+		// Create compact placeholder for display
+		const placeholder = `[@${filePath}]`;
+
+		// Create image placeholder content
+		const imageContent: PlaceholderContent = {
+			type: PlaceholderType.IMAGE,
+			displayText: placeholder,
+			filePath: filePath,
+			dataURL: dataURL,
+			mimeType: mimeType,
+			fileSize: stats.size,
+			lastModified: stats.mtimeMs,
+		};
+
+		const newPlaceholderContent = {
+			...currentPlaceholderContent,
+			[imageId]: imageContent,
+		};
+
+		// Replace the @mention text with placeholder in display
+		const newDisplayValue = currentDisplayValue.replace(
+			mentionText,
+			placeholder,
+		);
+
+		return {
+			displayValue: newDisplayValue,
+			placeholderContent: newPlaceholderContent,
+		};
+	} catch (_error) {
+		// If image processing fails, return null (silent failure)
+		return null;
+	}
 }
 
 /**

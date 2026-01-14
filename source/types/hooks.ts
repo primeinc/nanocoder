@@ -2,6 +2,7 @@
 export enum PlaceholderType {
 	PASTE = 'paste',
 	FILE = 'file',
+	IMAGE = 'image',
 	// Future types can be added here:
 	// TEMPLATE = 'template',
 	// ENV_VAR = 'env_var',
@@ -33,10 +34,20 @@ interface FilePlaceholderContent extends BasePlaceholderContent {
 	checksum?: string; // For detecting file changes
 }
 
+interface ImagePlaceholderContent extends BasePlaceholderContent {
+	type: PlaceholderType.IMAGE;
+	filePath: string; // Absolute or relative path
+	dataURL: string; // Base64-encoded data URL for the image
+	mimeType: string; // MIME type (e.g., 'image/png', 'image/jpeg')
+	fileSize?: number; // Original file size
+	lastModified?: number; // File modification time
+}
+
 // Union type for all placeholder content types - fully type-safe
 export type PlaceholderContent =
 	| PastePlaceholderContent
-	| FilePlaceholderContent;
+	| FilePlaceholderContent
+	| ImagePlaceholderContent;
 
 // Core data structure for placeholder handling system
 export interface InputState {

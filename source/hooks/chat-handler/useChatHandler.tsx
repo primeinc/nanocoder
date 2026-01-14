@@ -1,10 +1,9 @@
 import React from 'react';
 import {ConversationStateManager} from '@/app/utils/conversation-state';
 import UserMessage from '@/components/user-message';
-import {promptHistory} from '@/prompt-history';
-import type {Message} from '@/types/core';
+import type {Message, MessageContent} from '@/types/core';
 import {MessageBuilder} from '@/utils/message-builder';
-import {assemblePrompt, processPromptTemplate} from '@/utils/prompt-processor';
+import {processPromptTemplate} from '@/utils/prompt-processor';
 import {processAssistantResponse} from './conversation/conversation-loop';
 import {createResetStreamingState} from './state/streaming-state';
 import type {ChatHandlerReturn, UseChatHandlerProps} from './types';
@@ -120,22 +119,14 @@ export function useChatHandler({
 	);
 
 	// Handle chat message processing
-	const handleChatMessage = async (message: string) => {
+	const handleChatMessage = async (messageContent: MessageContent) => {
 		if (!client || !toolManager) return;
 
-		// For display purposes, try to get the placeholder version from history
-		// This preserves the nice placeholder display in chat history
-		// Only use history entry if the assembled prompt matches the current message
-		// (VS Code prompts bypass history, so we shouldn't use stale history entries)
-		const history = promptHistory.getHistory();
-		const lastEntry = history[history.length - 1];
-		const assembledFromHistory = lastEntry
-			? assemblePrompt(lastEntry)
-			: undefined;
-		const displayMessage =
-			assembledFromHistory === message ? lastEntry.displayValue : message;
+		// Convert MessageContent to string for display
+		// For multimodal content, we show a simplified version
+		const displayMessage = getDisplayMessage(messageContent);
 
-		// Add user message to chat using display version (with placeholders)
+		// Add user message to chat using display version
 		addToChatQueue(
 			<UserMessage
 				key={`user-${getNextComponentKey()}`}
@@ -145,13 +136,21 @@ export function useChatHandler({
 
 		// Add user message to conversation history
 		const builder = new MessageBuilder(messages);
-		builder.addUserMessage(message);
+		builder.addUserMessage(messageContent);
 		const updatedMessages = builder.build();
 		setMessages(updatedMessages);
 
 		// Initialize conversation state if this is a new conversation
+		// For multimodal messages, extract text for state initialization
+		const textForState =
+			typeof messageContent === 'string'
+				? messageContent
+				: messageContent
+						.filter(part => part.type === 'text')
+						.map(part => part.text)
+						.join(' ');
 		if (messages.length === 0) {
-			conversationStateManager.current.initializeState(message);
+			conversationStateManager.current.initializeState(textForState);
 		}
 
 		// Create abort controller for cancellation
@@ -197,4 +196,25 @@ export function useChatHandler({
 		streamingContent,
 		tokenCount,
 	};
+}
+
+/**
+ * Helper to get display message from MessageContent
+ * For multimodal content, shows text parts and image placeholders
+ */
+function getDisplayMessage(content: MessageContent): string {
+	if (typeof content === 'string') {
+		return content;
+	}
+
+	// For array content, convert to display string
+	return content
+		.map(part => {
+			if (part.type === 'text') {
+				return part.text;
+			}
+			// For images, show a placeholder
+			return '[Image]';
+		})
+		.join('');
 }

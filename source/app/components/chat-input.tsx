@@ -6,7 +6,7 @@ import ToolConfirmation from '@/components/tool-confirmation';
 import ToolExecutionIndicator from '@/components/tool-execution-indicator';
 import UserInput from '@/components/user-input';
 import {useTheme} from '@/hooks/useTheme';
-import type {DevelopmentMode, ToolCall} from '@/types';
+import type {DevelopmentMode, MessageContent, ToolCall} from '@/types';
 
 export interface ChatInputProps {
 	// Execution state
@@ -34,7 +34,7 @@ export interface ChatInputProps {
 	// Handlers
 	onToolConfirm: (confirmed: boolean) => void;
 	onToolCancel: () => void;
-	onSubmit: (message: string) => Promise<void>;
+	onSubmit: (message: MessageContent) => Promise<void>;
 	onCancel: () => void;
 	onToggleMode: () => void;
 }

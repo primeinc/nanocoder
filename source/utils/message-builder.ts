@@ -1,4 +1,4 @@
-import type {Message, ToolResult} from '@/types/core';
+import type {Message, MessageContent, ToolResult} from '@/types/core';
 
 /**
  * Builder pattern for constructing message arrays.
@@ -49,9 +49,9 @@ export class MessageBuilder {
 	}
 
 	/**
-	 * Add a user message.
+	 * Add a user message with support for multimodal content.
 	 */
-	addUserMessage(content: string): this {
+	addUserMessage(content: MessageContent): this {
 		this.messages.push({
 			role: 'user',
 			content,

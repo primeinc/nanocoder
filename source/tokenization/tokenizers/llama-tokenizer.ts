@@ -5,6 +5,7 @@
 
 import llamaTokenizer from 'llama-tokenizer-js';
 import type {Message} from '@/types/core';
+import {messageContentToString} from '@/types/core';
 import type {Tokenizer} from '../../types/tokenization';
 
 export class LlamaTokenizer implements Tokenizer {
@@ -25,7 +26,7 @@ export class LlamaTokenizer implements Tokenizer {
 	}
 
 	countTokens(message: Message): number {
-		const content = message.content || '';
+		const content = messageContentToString(message.content || '');
 		const role = message.role || '';
 
 		// Llama format: <|start_header_id|>role<|end_header_id|>content<|eot_id|>

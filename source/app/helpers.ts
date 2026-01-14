@@ -1,3 +1,4 @@
+import type {MessageContent} from '@/types/core';
 import type {
 	NonInteractiveCompletionResult,
 	NonInteractiveModeState,
@@ -25,17 +26,36 @@ export function isNonInteractiveModeComplete(
 
 	// Check for error messages in the messages array
 	const hasErrorMessages = appState.messages.some(
-		(message: {role: string; content: string}) =>
-			message.role === 'error' ||
-			(typeof message.content === 'string' &&
-				message.content.toLowerCase().includes('error')),
+		(message: {role: string; content: MessageContent}) => {
+			const content =
+				typeof message.content === 'string'
+					? message.content
+					: message.content
+							.filter(part => part.type === 'text')
+							.map(part => part.text)
+							.join('');
+			return (
+				message.role === 'error' ||
+				(typeof content === 'string' && content.toLowerCase().includes('error'))
+			);
+		},
 	);
 
 	// Check for tool approval required messages
 	const hasToolApprovalRequired = appState.messages.some(
-		(message: {role: string; content: string}) =>
-			typeof message.content === 'string' &&
-			message.content.includes('Tool approval required'),
+		(message: {role: string; content: MessageContent}) => {
+			const content =
+				typeof message.content === 'string'
+					? message.content
+					: message.content
+							.filter(part => part.type === 'text')
+							.map(part => part.text)
+							.join('');
+			return (
+				typeof content === 'string' &&
+				content.includes('Tool approval required')
+			);
+		},
 	);
 
 	if (hasTimedOut) {
